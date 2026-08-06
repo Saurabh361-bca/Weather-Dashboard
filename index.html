@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <title>Weather Dashboard — Premium Weather Forecast</title>
+  <meta name="description" content="A premium weather dashboard with current conditions, hourly and 5-day forecast, air quality, interactive charts, animated backgrounds, voice search and offline support." />
+  <meta name="keywords" content="weather, forecast, dashboard, air quality, hourly forecast, 5 day forecast, PWA" />
+  <meta name="author" content="Weather Dashboard" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Weather Dashboard — Premium Weather Forecast" />
+  <meta property="og:description" content="Current weather, hourly and 5-day forecast, air quality, interactive charts and animated backgrounds." />
+  <meta property="og:image" content="./favicon.svg" />
+  <meta property="og:site_name" content="Weather Dashboard" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Weather Dashboard" />
+  <meta name="twitter:description" content="Premium weather forecast dashboard with charts and animated backgrounds." />
+  <meta name="twitter:image" content="./favicon.svg" />
+
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="apple-touch-icon" href="./icon-192.svg" />
+  <link rel="manifest" href="./manifest.json" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/animations.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+</head>
+<body>
+  <!-- Animated weather background canvas -->
+  <canvas id="weatherCanvas" aria-hidden="true"></canvas>
+
+  <!-- Skip link for keyboard users -->
+  <a href="#weatherMain" class="skip-link">Skip to content</a>
+
+  <!-- Global spinner -->
+  <div id="globalSpinner" class="global-spinner" hidden aria-hidden="true">
+    <div class="spinner-ring"></div>
+  </div>
+
+  <!-- Sticky navigation -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <a href="./" class="brand" aria-label="Weather Dashboard home">
+        <span class="brand-mark"><i class="fa-solid fa-cloud-sun"></i></span>
+        <span class="brand-name">Weather<span>Dashboard</span></span>
+      </a>
+
+      <form id="searchForm" class="search-form" role="search" autocomplete="off">
+        <div class="search-box glass">
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input
+            id="searchInput"
+            type="text"
+            class="search-input"
+            placeholder="Search city…"
+            aria-label="Search city"
+            aria-autocomplete="list"
+            aria-controls="suggestions"
+            aria-expanded="false"
+            spellcheck="false"
+          />
+          <button type="button" id="voiceBtn" class="icon-btn voice-btn" aria-label="Voice search" title="Voice search">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+        </div>
+        <div id="suggestions" class="suggestions glass" role="listbox" hidden></div>
+      </form>
+
+      <nav class="topbar-actions" aria-label="Primary">
+        <button id="geoBtn" class="icon-btn" aria-label="Use my location" title="Use my location">
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+        <button id="compareBtn" class="icon-btn" aria-label="Compare cities" title="Compare cities">
+          <i class="fa-solid fa-code-compare"></i>
+        </button>
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="settingsBtn" class="icon-btn" aria-label="Settings" title="Settings">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+        <button id="installBtn" class="btn btn-primary install-btn" hidden aria-label="Install app">
+          <i class="fa-solid fa-download"></i> Install
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Sidebar: favorites + history + map -->
+  <aside class="sidebar" aria-label="Saved locations">
+    <section class="side-section glass">
+      <h2 class="side-title"><i class="fa-solid fa-star"></i> Favorites</h2>
+      <div id="favoritesList" class="chip-list"></div>
+    </section>
+    <section class="side-section glass">
+      <div class="side-head">
+        <h2 class="side-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent</h2>
+        <button id="clearHistoryBtn" class="link-btn" aria-label="Clear history">Clear</button>
+      </div>
+      <div id="historyList" class="chip-list"></div>
+    </section>
+    <section id="mapCard" class="side-section glass" aria-label="Weather map"></section>
+  </aside>
+
+  <!-- Main weather content -->
+  <main id="weatherMain" class="weather-main" role="main" tabindex="-1"></main>
+
+  <!-- Settings panel (slide-in) -->
+  <aside id="settingsPanel" class="settings-panel" aria-label="Settings" aria-hidden="true">
+    <div class="settings-head">
+      <h2><i class="fa-solid fa-gear"></i> Settings</h2>
+      <button id="settingsClose" class="icon-btn" aria-label="Close settings"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="settingsList" class="settings-body"></div>
+    <div class="settings-foot">
+      <p class="muted">Preferences are saved on this device.</p>
+    </div>
+  </aside>
+  <div id="settingsScrim" class="scrim" hidden></div>
+
+  <!-- Compare modal -->
+  <dialog id="compareModal" class="modal">
+    <div class="modal-head">
+      <h2><i class="fa-solid fa-code-compare"></i> Compare cities</h2>
+      <button id="cmpCloseBtn" class="icon-btn" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-form">
+      <label>City A <input id="cmpInputA" type="text" placeholder="e.g. London" /></label>
+      <label>City B <input id="cmpInputB" type="text" placeholder="e.g. Tokyo" /></label>
+      <button id="cmpRunBtn" class="btn btn-primary">Compare</button>
+    </div>
+    <div class="cmp-body"></div>
+  </dialog>
+
+  <!-- Toast container -->
+  <div id="toastWrap" class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <p>Weather Dashboard · Built with HTML5, CSS3 &amp; Vanilla JavaScript · Data by OpenWeatherMap</p>
+  </footer>
+
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Export libraries (CDN, used by PNG/PDF download) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- App entry (ES6 modules) -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

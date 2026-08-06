@@ -1,0 +1,23 @@
+{
+  "name": "Weather Dashboard",
+  "short_name": "Weather",
+  "description": "Premium weather dashboard with current conditions, hourly and 5-day forecast, air quality, interactive charts and animated backgrounds.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0f172a",
+  "background_color": "#0b1220",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["weather", "utilities", "productivity"],
+  "icons": [
+    { "src": "./favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "./icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Search city", "url": "./?action=search" },
+    { "name": "Use my location", "url": "./?action=locate" }
+  ]
+}
